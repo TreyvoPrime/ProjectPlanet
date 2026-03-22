@@ -51,18 +51,41 @@ Open `http://127.0.0.1:8000`.
 ## Railway Setup
 
 1. Push this repo to GitHub.
-2. Create a Railway project from the GitHub repo.
-3. Add a persistent volume and mount it so `DATABASE_PATH` points to that mounted directory.
-4. Set the environment variables from `.env.example`.
-5. In the Discord Developer Portal, add the Railway callback URL:
+2. Create a fresh Railway project from the GitHub repo.
+3. Make sure the project contains only one public app service for this repo. Do not attach your public domain to any database service.
+4. Prefer the Dockerfile deploy path for a deterministic build.
+5. Add a persistent volume and mount it only if you want SQLite persistence across redeploys.
+6. Set the environment variables from `.env.example`.
+7. In the Discord Developer Portal, add the Railway callback URL:
    `https://your-app.up.railway.app/auth/callback`
-6. Deploy.
+8. Deploy.
 
 Recommended `DATABASE_PATH` on Railway:
 
 ```text
 /data/battlebot.db
 ```
+
+Fastest test-only fallback if you do not have a volume mounted yet:
+
+```text
+./battlebot.db
+```
+
+## Clean Railway Rebuild
+
+If Railway got into a weird state with multiple services or the public domain is pointing at the wrong thing, the clean reset path is:
+
+1. Create a brand new Railway project.
+2. Deploy only this GitHub repository into that new project.
+3. Do not add MySQL or any other database service.
+4. Generate one public domain for the app service only.
+5. Set:
+   `PUBLIC_BASE_URL=https://your-service.up.railway.app`
+6. Set:
+   `DISCORD_REDIRECT_URI=https://your-service.up.railway.app/auth/callback`
+7. Add that same callback URL in the Discord Developer Portal.
+8. Redeploy and test `/healthz`.
 
 ## Discord Application Setup
 

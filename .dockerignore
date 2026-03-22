@@ -1,0 +1,6 @@
+.git
+__pycache__
+.venv
+.env
+battlebot.db
+*.pyc
