@@ -127,10 +127,19 @@ class Database:
                     user_id TEXT NOT NULL,
                     access_token TEXT NOT NULL,
                     user_payload TEXT NOT NULL,
+                    guilds_payload TEXT NOT NULL DEFAULT '[]',
                     created_at TEXT NOT NULL
                 )
                 """
             )
+            oauth_columns = {
+                row[1]
+                for row in await (await db.execute("PRAGMA table_info(oauth_sessions)")).fetchall()
+            }
+            if "guilds_payload" not in oauth_columns:
+                await db.execute(
+                    "ALTER TABLE oauth_sessions ADD COLUMN guilds_payload TEXT NOT NULL DEFAULT '[]'"
+                )
             await db.commit()
 
     async def ensure_guild(self, guild_id: int) -> GuildConfig:
@@ -274,19 +283,20 @@ class Database:
             await db.commit()
         return cursor.rowcount > 0
 
-    async def create_oauth_session(self, user_payload: dict, access_token: str) -> str:
+    async def create_oauth_session(self, user_payload: dict, guilds_payload: list[dict], access_token: str) -> str:
         session_id = secrets.token_urlsafe(32)
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
                 """
-                INSERT INTO oauth_sessions (session_id, user_id, access_token, user_payload, created_at)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO oauth_sessions (session_id, user_id, access_token, user_payload, guilds_payload, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     session_id,
                     str(user_payload["id"]),
                     access_token,
                     json.dumps(user_payload),
+                    json.dumps(guilds_payload),
                     utc_now().isoformat(),
                 ),
             )
@@ -297,7 +307,7 @@ class Database:
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.execute(
                 """
-                SELECT user_id, access_token, user_payload, created_at
+                SELECT user_id, access_token, user_payload, guilds_payload, created_at
                 FROM oauth_sessions
                 WHERE session_id = ?
                 """,
@@ -306,13 +316,14 @@ class Database:
             row = await cursor.fetchone()
         if not row:
             return None
-        user_id, access_token, user_payload, created_at = row
+        user_id, access_token, user_payload, guilds_payload, created_at = row
         payload = json.loads(user_payload)
         payload["id"] = user_id
         return {
             "session_id": session_id,
             "access_token": access_token,
             "user": payload,
+            "guilds": json.loads(guilds_payload),
             "created_at": created_at,
         }
 
@@ -450,6 +461,7 @@ async def get_session_user(request: Request) -> Optional[dict]:
     user = dict(session_data["user"])
     user["access_token"] = session_data["access_token"]
     user["session_id"] = session_id
+    user["guilds"] = session_data["guilds"]
     return user
 
 
@@ -462,14 +474,7 @@ async def require_session_user(request: Request) -> dict:
 
 async def get_manageable_guilds_for_user(request: Request) -> list[dict]:
     session_user = await require_session_user(request)
-    try:
-        _, raw_guilds = await fetch_discord_identity(session_user["access_token"])
-    except httpx.HTTPError as exc:
-        session_id = request.session.get("oauth_session_id")
-        if session_id:
-            await database.delete_oauth_session(session_id)
-        request.session.clear()
-        raise HTTPException(status_code=401, detail="Discord session expired. Please log in again.") from exc
+    raw_guilds = session_user.get("guilds", [])
     manageable_guilds = []
 
     for guild_payload in raw_guilds:
@@ -1011,7 +1016,7 @@ async def auth_callback(request: Request, code: str, state: str) -> RedirectResp
         raise HTTPException(status_code=400, detail="OAuth state mismatch.")
 
     token_payload = await exchange_code_for_token(code)
-    user_payload, _ = await fetch_discord_identity(token_payload["access_token"])
+    user_payload, guilds_payload = await fetch_discord_identity(token_payload["access_token"])
     minimal_user = {
         "id": user_payload["id"],
         "username": user_payload["username"],
@@ -1019,7 +1024,11 @@ async def auth_callback(request: Request, code: str, state: str) -> RedirectResp
         "avatar": user_payload.get("avatar"),
         "discriminator": user_payload.get("discriminator", "0"),
     }
-    request.session["oauth_session_id"] = await database.create_oauth_session(minimal_user, token_payload["access_token"])
+    request.session["oauth_session_id"] = await database.create_oauth_session(
+        minimal_user,
+        guilds_payload,
+        token_payload["access_token"],
+    )
     request.session.pop("oauth_state", None)
     return RedirectResponse("/dashboard", status_code=302)
 
