@@ -59,6 +59,22 @@ class RegimentConfig:
     sort_order: int
 
 
+@dataclass
+class AuditLogEntry:
+    id: int
+    guild_id: int
+    dispatched_by_user_id: str
+    dispatched_by_name: str
+    regiment_name: str
+    role_id: int
+    voice_channel_link: str
+    custom_message: str
+    sent_count: int
+    skipped_count: int
+    failed_count: int
+    created_at: str
+
+
 class Database:
     def __init__(self, db_path: Path):
         self.db_path = db_path
@@ -140,6 +156,24 @@ class Database:
                 await db.execute(
                     "ALTER TABLE oauth_sessions ADD COLUMN guilds_payload TEXT NOT NULL DEFAULT '[]'"
                 )
+            await db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS dispatch_audit_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    guild_id INTEGER NOT NULL,
+                    dispatched_by_user_id TEXT NOT NULL,
+                    dispatched_by_name TEXT NOT NULL,
+                    regiment_name TEXT NOT NULL,
+                    role_id INTEGER NOT NULL,
+                    voice_channel_link TEXT NOT NULL,
+                    custom_message TEXT NOT NULL,
+                    sent_count INTEGER NOT NULL,
+                    skipped_count INTEGER NOT NULL,
+                    failed_count INTEGER NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
             await db.commit()
 
     async def ensure_guild(self, guild_id: int) -> GuildConfig:
@@ -331,6 +365,60 @@ class Database:
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute("DELETE FROM oauth_sessions WHERE session_id = ?", (session_id,))
             await db.commit()
+
+    async def create_dispatch_audit_log(
+        self,
+        guild_id: int,
+        dispatched_by_user_id: str,
+        dispatched_by_name: str,
+        regiment_name: str,
+        role_id: int,
+        voice_channel_link: str,
+        custom_message: str,
+        sent_count: int,
+        skipped_count: int,
+        failed_count: int,
+    ) -> None:
+        async with aiosqlite.connect(self.db_path) as db:
+            await db.execute(
+                """
+                INSERT INTO dispatch_audit_logs (
+                    guild_id, dispatched_by_user_id, dispatched_by_name, regiment_name, role_id,
+                    voice_channel_link, custom_message, sent_count, skipped_count, failed_count, created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    guild_id,
+                    dispatched_by_user_id,
+                    dispatched_by_name,
+                    regiment_name,
+                    role_id,
+                    voice_channel_link,
+                    custom_message,
+                    sent_count,
+                    skipped_count,
+                    failed_count,
+                    utc_now().isoformat(),
+                ),
+            )
+            await db.commit()
+
+    async def get_dispatch_audit_logs(self, guild_id: int, limit: int = 20) -> list[AuditLogEntry]:
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.execute(
+                """
+                SELECT id, guild_id, dispatched_by_user_id, dispatched_by_name, regiment_name, role_id,
+                       voice_channel_link, custom_message, sent_count, skipped_count, failed_count, created_at
+                FROM dispatch_audit_logs
+                WHERE guild_id = ?
+                ORDER BY datetime(created_at) DESC
+                LIMIT ?
+                """,
+                (guild_id, limit),
+            )
+            rows = await cursor.fetchall()
+        return [AuditLogEntry(*row) for row in rows]
 
 
 database = Database(DATABASE_PATH)
@@ -625,6 +713,18 @@ class BattleModal(discord.ui.Modal, title="Dispatch Battle Alert"):
             ),
             ephemeral=True,
         )
+        await database.create_dispatch_audit_log(
+            guild_id=interaction.guild.id,
+            dispatched_by_user_id=str(interaction.user.id),
+            dispatched_by_name=str(interaction.user),
+            regiment_name=self.regiment.regiment_name,
+            role_id=self.regiment.role_id,
+            voice_channel_link=str(self.vc_link.value),
+            custom_message=dispatch_message,
+            sent_count=sent,
+            skipped_count=skipped,
+            failed_count=failed,
+        )
 
 
 class RegimentSelect(discord.ui.Select):
@@ -906,6 +1006,7 @@ async def get_dashboard_context(request: Request, guild_id: int) -> dict:
 
     regiments = await database.get_regiments(guild_id)
     admin_role_ids = set(await database.get_admin_role_ids(guild_id))
+    audit_logs = await database.get_dispatch_audit_logs(guild_id, limit=12)
     roles = [
         serialize_role(role)
         for role in sorted(guild.roles, key=lambda current: current.position, reverse=True)
@@ -919,6 +1020,7 @@ async def get_dashboard_context(request: Request, guild_id: int) -> dict:
         "regiments": regiments,
         "roles": roles,
         "admin_role_ids": admin_role_ids,
+        "audit_logs": audit_logs,
         "dashboard_url": await build_dashboard_url(guild_id),
         "max_regiments": MAX_REGIMENTS_PER_GUILD,
         "user": user,

@@ -697,6 +697,37 @@ option {
     align-items: center;
 }
 
+.audit-card {
+    align-items: flex-start;
+}
+
+.audit-main {
+    display: grid;
+    gap: 6px;
+}
+
+.audit-message {
+    color: var(--muted-strong);
+}
+
+.audit-stats {
+    display: grid;
+    gap: 8px;
+    min-width: 112px;
+}
+
+.audit-stats span {
+    display: inline-flex;
+    justify-content: center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #293140;
+    color: var(--muted-strong);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
 .empty-card {
     padding: 24px;
     display: grid;

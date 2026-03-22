@@ -197,6 +197,40 @@
                         </div>
                     </article>
                 </section>
+
+                <section class="panel-grid" id="history">
+                    <article class="panel-section panel-span-2 official-card">
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-tag">Audit log</span>
+                                <h2>Recent battle dispatches</h2>
+                            </div>
+                        </div>
+                        {% if audit_logs %}
+                        <div class="list-stack">
+                            {% for log in audit_logs %}
+                            <div class="list-card audit-card">
+                                <div class="audit-main">
+                                    <h3>{{ log.regiment_name }}</h3>
+                                    <p>Sent by {{ log.dispatched_by_name }} on {{ log.created_at.replace('T', ' ').split('+')[0] }}</p>
+                                    <p class="audit-message">{{ log.custom_message }}</p>
+                                </div>
+                                <div class="audit-stats">
+                                    <span>Sent {{ log.sent_count }}</span>
+                                    <span>Skipped {{ log.skipped_count }}</span>
+                                    <span>Failed {{ log.failed_count }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-card">
+                            <h3>No dispatch history yet</h3>
+                            <p>Once your staff sends battle alerts, they will appear here automatically.</p>
+                        </div>
+                        {% endif %}
+                    </article>
+                </section>
             </section>
         </main>
     </div>
