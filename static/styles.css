@@ -1,0 +1,458 @@
+:root {
+    --bg: #f1e4c5;
+    --bg-deep: #d7be8a;
+    --panel: rgba(69, 31, 18, 0.9);
+    --panel-soft: rgba(109, 58, 34, 0.82);
+    --panel-border: rgba(244, 210, 131, 0.35);
+    --text: #f8edd5;
+    --muted: #d5c09b;
+    --accent: #d7a428;
+    --accent-deep: #8f5b10;
+    --danger: #9f3322;
+    --shadow: 0 24px 70px rgba(45, 20, 9, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Manrope", sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(255, 232, 175, 0.85), transparent 30%),
+        radial-gradient(circle at right, rgba(135, 45, 17, 0.2), transparent 35%),
+        linear-gradient(135deg, #efe1bb 0%, #d7be8a 35%, #bea372 100%);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.landing-body {
+    display: grid;
+    place-items: center;
+    padding: 32px;
+}
+
+.landing-shell,
+.page-shell {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0 48px;
+}
+
+.hero-card,
+.banner,
+.panel,
+.regiment-card,
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-soft) 100%);
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+}
+
+.hero-card,
+.banner,
+.panel {
+    padding: 28px;
+}
+
+.hero-card::after,
+.banner::after,
+.panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255, 223, 154, 0.08));
+    pointer-events: none;
+}
+
+.banner {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 22px;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: var(--accent);
+}
+
+h1,
+h2,
+h3 {
+    margin: 0;
+    font-family: "Cinzel", serif;
+}
+
+h1 {
+    font-size: clamp(2.4rem, 4vw, 4.8rem);
+    line-height: 0.95;
+    max-width: 12ch;
+}
+
+h2 {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+}
+
+h3 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+}
+
+.lead,
+.muted,
+.info-panel p,
+.regiment-card p {
+    color: var(--muted);
+}
+
+.lead {
+    margin-top: 14px;
+    max-width: 62ch;
+    font-size: 1.02rem;
+    line-height: 1.7;
+}
+
+.info-panel {
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 234, 188, 0.08);
+    border: 1px solid rgba(255, 231, 187, 0.15);
+}
+
+.stat-row,
+.grid.two-up,
+.regiment-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.stat-row {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin-top: 26px;
+}
+
+.grid.two-up {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    padding: 18px 20px;
+}
+
+.stat-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.banner-side {
+    justify-content: flex-end;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255, 223, 154, 0.09);
+    border: 1px solid rgba(255, 226, 170, 0.22);
+    color: var(--text);
+    font-weight: 700;
+}
+
+.stack {
+    display: grid;
+    gap: 14px;
+}
+
+label {
+    display: grid;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.input,
+select,
+textarea {
+    width: 100%;
+    border: 1px solid rgba(252, 227, 170, 0.25);
+    border-radius: 14px;
+    background: rgba(255, 241, 208, 0.08);
+    color: var(--text);
+    padding: 12px 14px;
+    font: inherit;
+}
+
+.input[readonly] {
+    color: var(--muted);
+}
+
+option {
+    color: #28160d;
+}
+
+.button {
+    appearance: none;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font: inherit;
+    font-weight: 800;
+    color: #2b170c;
+    background: linear-gradient(180deg, #efc764, #cf9723);
+    cursor: pointer;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+}
+
+.button-link,
+.text-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.button-link {
+    appearance: none;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font: inherit;
+    font-weight: 800;
+    color: #2b170c;
+    background: linear-gradient(180deg, #efc764, #cf9723);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+}
+
+.button-link-secondary {
+    background: linear-gradient(180deg, #f0e0b6, #cab17c);
+}
+
+.text-link {
+    color: #ffe2a0;
+    font-weight: 700;
+}
+
+.cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.setup-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-top: 26px;
+}
+
+.setup-strip.compact {
+    margin-top: 0;
+}
+
+.setup-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 239, 204, 0.08);
+    border: 1px solid rgba(255, 228, 174, 0.14);
+}
+
+.setup-step.complete {
+    background: rgba(215, 164, 40, 0.16);
+    border-color: rgba(255, 228, 174, 0.3);
+}
+
+.setup-step span {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 231, 180, 0.18);
+    color: #fff1c9;
+    font-family: "Cinzel", serif;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.setup-step p {
+    margin: 0;
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.progress-panel {
+    margin-bottom: 20px;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.button-secondary {
+    background: linear-gradient(180deg, #f0e0b6, #cab17c);
+}
+
+.button-danger {
+    color: #fff5ef;
+    background: linear-gradient(180deg, #c95d49, #922818);
+}
+
+.checkbox-list {
+    max-height: 320px;
+    overflow: auto;
+    display: grid;
+    gap: 10px;
+    padding-right: 6px;
+}
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(255, 239, 204, 0.08);
+    border: 1px solid rgba(255, 228, 174, 0.18);
+}
+
+.user-chip.compact {
+    max-width: 320px;
+}
+
+.user-chip img,
+.guild-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-chip p {
+    margin: 2px 0 0;
+    color: var(--muted);
+}
+
+.guild-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.guild-card {
+    align-items: flex-start;
+}
+
+.guild-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.guild-icon-fallback {
+    display: grid;
+    place-items: center;
+    background: rgba(255, 225, 155, 0.22);
+    color: #fff2cc;
+    font-family: "Cinzel", serif;
+    font-size: 1.25rem;
+}
+
+.command-card {
+    padding: 18px 20px;
+    border-radius: 18px;
+    background: rgba(255, 239, 204, 0.08);
+    border: 1px solid rgba(255, 228, 174, 0.18);
+}
+
+.command-card code {
+    font-size: 1.1rem;
+}
+
+.checkbox-row {
+    grid-template-columns: 20px 1fr;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255, 239, 204, 0.06);
+}
+
+.section-header {
+    margin-bottom: 18px;
+}
+
+.regiment-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.regiment-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px;
+}
+
+.empty-state {
+    border-radius: 18px;
+    padding: 24px;
+    background: rgba(255, 237, 196, 0.08);
+    border: 1px dashed rgba(255, 227, 166, 0.28);
+}
+
+code {
+    font-family: "Consolas", "Courier New", monospace;
+    color: #ffe7a8;
+}
+
+@media (max-width: 760px) {
+    .landing-shell,
+    .page-shell {
+        width: min(100% - 24px, 1180px);
+        padding-top: 22px;
+    }
+
+    .hero-card,
+    .banner,
+    .panel {
+        padding: 22px;
+    }
+
+    .banner,
+    .regiment-card {
+        flex-direction: column;
+    }
+}

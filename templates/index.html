@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BattleBot Command</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="landing-body">
+    <main class="landing-shell">
+        <section class="hero-card">
+            <p class="eyebrow">BattleBot Command</p>
+            <h1>Napoleonic dispatches for Discord regiments.</h1>
+            <p class="lead">
+                Turn battle pings into a real command system: regiment-based DM alerts, secure dashboard links,
+                per-server customization, and Railway-friendly hosting from a single service.
+            </p>
+            <div class="stat-row">
+                <div class="stat-card">
+                    <span class="stat-label">Bot Status</span>
+                    <strong>{{ "Online" if bot_ready else "Offline" }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Servers</span>
+                    <strong>{{ guild_count }}</strong>
+                </div>
+            </div>
+            <div class="info-panel">
+                <p>The dashboard now uses Discord login and guild permission checks, so server managers can sign in and manage only the communities they control.</p>
+                <p>Your Railway public URL should be set as <code>PUBLIC_BASE_URL</code>. Current value: <code>{{ public_base_url }}</code></p>
+            </div>
+            <div class="cta-row">
+                {% if oauth_ready %}
+                    {% if user %}
+                    <a class="button-link" href="{{ dashboard_url }}">Open Dashboard</a>
+                    {% else %}
+                    <a class="button-link" href="{{ login_url }}">Login with Discord</a>
+                    {% endif %}
+                {% endif %}
+                {% if invite_url %}
+                <a class="button-link button-link-secondary" href="{{ invite_url }}">Invite the Bot</a>
+                {% endif %}
+            </div>
+            <div class="setup-strip">
+                {% for step in setup_steps %}
+                <div class="setup-step">
+                    <span>{{ loop.index }}</span>
+                    <p>{{ step }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
