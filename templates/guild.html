@@ -3,148 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ guild.name }} | BattleBot Command</title>
+    <title>{{ guild.name }} | BattleBot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <main class="page-shell">
-        <section class="banner">
-            <div>
-                <p class="eyebrow">Command Dashboard</p>
-                <h1>{{ guild.name }}</h1>
-                <p class="lead">Organize your regiments, assign command staff, and keep your battle dispatches moving without missed DMs.</p>
-            </div>
-            <div class="banner-actions banner-side">
-                <span class="pill">Cooldown {{ guild_config.cooldown_minutes }} min</span>
-                <span class="pill">{{ regiments|length }}/{{ max_regiments }} regiments</span>
-                <div class="user-chip compact">
+    <div class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="/dashboard">
+                <span class="brand-mark">B</span>
+                <span>BattleBot</span>
+            </a>
+            <div class="topbar-actions">
+                <a class="button button-secondary" href="/dashboard">All servers</a>
+                <a class="button button-secondary" href="/dashboard/{{ guild.id }}/setup">Setup guide</a>
+                {% if bot_invite_url %}
+                <a class="button button-secondary" href="{{ bot_invite_url }}">Invite bot</a>
+                {% endif %}
+                <div class="account-chip">
                     <img src="{{ user.avatar_url }}" alt="Discord avatar">
                     <div>
                         <strong>{{ user.global_name or user.username }}</strong>
-                        <p>@{{ user.username }}</p>
+                        <span>@{{ user.username }}</span>
                     </div>
                 </div>
-                <a class="text-link" href="/dashboard">Back to Guilds</a>
-                <a class="text-link" href="/dashboard/{{ guild.id }}/setup">Setup Wizard</a>
             </div>
-        </section>
+        </header>
 
-        <section class="panel progress-panel">
-            <div class="section-header">
-                <div>
-                    <p class="eyebrow">Readiness</p>
-                    <h2>Campaign Setup Progress</h2>
-                </div>
-                <span class="pill">{{ setup_progress.completed }}/{{ setup_progress.total }} complete</span>
-            </div>
-            <div class="setup-strip compact">
-                <div class="setup-step {% if setup_progress.has_admin_roles %}complete{% endif %}">
-                    <span>1</span>
-                    <p>Assign command staff roles</p>
-                </div>
-                <div class="setup-step {% if setup_progress.has_regiments %}complete{% endif %}">
-                    <span>2</span>
-                    <p>Create regiment mappings</p>
-                </div>
-                <div class="setup-step complete">
-                    <span>3</span>
-                    <p>Run <code>/battleping</code> in Discord</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="grid two-up">
-            <article class="panel">
-                <h2>Dispatch Settings</h2>
-                <form method="post" action="/guild/{{ guild.id }}/settings" class="stack">
-                    <label>
-                        Cooldown Minutes
-                        <input class="input" type="number" name="cooldown_minutes" min="0" max="120" value="{{ guild_config.cooldown_minutes }}">
-                    </label>
-                    <button class="button" type="submit">Save Settings</button>
-                </form>
-            </article>
-
-            <article class="panel">
-                <h2>Public Bot Flow</h2>
-                <div class="stack">
-                    <p class="muted">This dashboard is protected by Discord login plus guild permission checks. Members only see servers they can actually manage.</p>
-                    {% if bot_invite_url %}
-                    <a class="button-link button-link-secondary" href="{{ bot_invite_url }}">Open Invite Link</a>
-                    {% endif %}
-                </div>
-            </article>
-        </section>
-
-        <section class="grid two-up">
-            <article class="panel">
-                <h2>Command Staff Roles</h2>
-                <form method="post" action="/guild/{{ guild.id }}/admin-roles" class="stack">
-                    <div class="checkbox-list">
-                        {% for role in roles %}
-                        <label class="checkbox-row">
-                            <input type="checkbox" name="admin_role_ids" value="{{ role.id }}" {% if role.id in admin_role_ids %}checked{% endif %}>
-                            <span>{{ role.name }}</span>
-                        </label>
-                        {% endfor %}
+        <main class="dashboard-layout">
+            <aside class="sidebar">
+                <div class="sidebar-card server-identity">
+                    <div class="server-badge">{{ guild.name[:1] }}</div>
+                    <div>
+                        <h2>{{ guild.name }}</h2>
+                        <p>Alert command center</p>
                     </div>
-                    <button class="button" type="submit">Update Command Staff</button>
-                </form>
-            </article>
-
-            <article class="panel">
-                <h2>Add Regiment</h2>
-                <form method="post" action="/guild/{{ guild.id }}/regiments" class="stack">
-                    <label>
-                        Regiment Name
-                        <input class="input" type="text" name="regiment_name" maxlength="60" placeholder="1st Grenadiers" required>
-                    </label>
-                    <label>
-                        Discord Role
-                        <select class="input" name="role_id" required>
-                            <option value="">Select a role</option>
-                            {% for role in roles %}
-                            <option value="{{ role.id }}">{{ role.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
-                    <button class="button" type="submit">Add Regiment Mapping</button>
-                </form>
-            </article>
-        </section>
-
-        <section class="panel">
-            <div class="section-header">
-                <div>
-                    <p class="eyebrow">Active Regiments</p>
-                    <h2>Battle Dispatch Targets</h2>
                 </div>
-            </div>
-            <div class="regiment-grid">
-                {% if regiments %}
-                    {% for regiment in regiments %}
-                    <article class="regiment-card">
-                        <div>
-                            <h3>{{ regiment.regiment_name }}</h3>
-                            <p>Role ID {{ regiment.role_id }}</p>
-                            <p class="muted">Snapshot: {{ regiment.role_name_snapshot }}</p>
+                <nav class="sidebar-nav">
+                    <a href="#overview">Overview</a>
+                    <a href="#regiments">Regiments</a>
+                    <a href="#staff">Command Staff</a>
+                    <a href="#settings">Settings</a>
+                </nav>
+                <div class="sidebar-card progress-card">
+                    <span class="section-tag">Setup progress</span>
+                    <div class="progress-meter">
+                        <div class="progress-fill" style="width: {{ (setup_progress.completed / setup_progress.total * 100) | round(0, 'floor') }}%;"></div>
+                    </div>
+                    <p>{{ setup_progress.completed }} of {{ setup_progress.total }} steps complete</p>
+                </div>
+            </aside>
+
+            <section class="dashboard-main">
+                <section class="page-hero" id="overview">
+                    <div>
+                        <span class="section-tag">Server overview</span>
+                        <h1>{{ guild.name }}</h1>
+                        <p class="page-subtitle">Manage who can send alerts, which regiments receive them, and how often dispatches can go out.</p>
+                    </div>
+                    <div class="hero-badges">
+                        <span class="status-chip">{{ regiments|length }} / {{ max_regiments }} regiments</span>
+                        <span class="status-chip">{{ guild_config.cooldown_minutes }} min cooldown</span>
+                    </div>
+                </section>
+
+                <section class="overview-grid">
+                    <article class="overview-card">
+                        <span>Regiments</span>
+                        <strong>{{ regiments|length }}</strong>
+                    </article>
+                    <article class="overview-card">
+                        <span>Command staff roles</span>
+                        <strong>{{ admin_role_ids|length }}</strong>
+                    </article>
+                    <article class="overview-card">
+                        <span>Dispatch cooldown</span>
+                        <strong>{{ guild_config.cooldown_minutes }} min</strong>
+                    </article>
+                </section>
+
+                <section class="panel-grid" id="regiments">
+                    <article class="panel-section panel-span-2">
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-tag">Regiments</span>
+                                <h2>Current regiment targets</h2>
+                            </div>
                         </div>
-                        <form method="post" action="/guild/{{ guild.id }}/regiments/{{ regiment.id }}/delete">
-                            <button class="button button-danger" type="submit">Remove</button>
+                        {% if regiments %}
+                        <div class="list-stack">
+                            {% for regiment in regiments %}
+                            <div class="list-card">
+                                <div>
+                                    <h3>{{ regiment.regiment_name }}</h3>
+                                    <p>Sends battle alerts to the {{ regiment.role_name_snapshot }} role.</p>
+                                </div>
+                                <form method="post" action="/guild/{{ guild.id }}/regiments/{{ regiment.id }}/delete">
+                                    <button class="button button-danger" type="submit">Remove</button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-card">
+                            <h3>No regiments yet</h3>
+                            <p>Add your first regiment so `/battleping` has somewhere to send alerts.</p>
+                        </div>
+                        {% endif %}
+                    </article>
+
+                    <article class="panel-section">
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-tag">Add new</span>
+                                <h2>Create regiment</h2>
+                            </div>
+                        </div>
+                        <form method="post" action="/guild/{{ guild.id }}/regiments" class="form-stack">
+                            <label>
+                                Regiment name
+                                <input class="input" type="text" name="regiment_name" maxlength="60" placeholder="1st Grenadiers" required>
+                            </label>
+                            <label>
+                                Discord role
+                                <select class="input" name="role_id" required>
+                                    <option value="">Select a role</option>
+                                    {% for role in roles %}
+                                    <option value="{{ role.id }}">{{ role.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <button class="button" type="submit">Save regiment</button>
                         </form>
                     </article>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <h3>No regiments configured yet.</h3>
-                        <p>Add your first regiment mapping above, then use <code>/battleping</code> in Discord.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </section>
-    </main>
+                </section>
+
+                <section class="panel-grid" id="staff">
+                    <article class="panel-section panel-span-2">
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-tag">Access</span>
+                                <h2>Command staff</h2>
+                            </div>
+                        </div>
+                        <p class="section-copy">Choose which server roles are allowed to configure BattleBot and send alerts.</p>
+                        <form method="post" action="/guild/{{ guild.id }}/admin-roles" class="form-stack">
+                            <div class="role-grid">
+                                {% for role in roles %}
+                                <label class="role-option">
+                                    <input type="checkbox" name="admin_role_ids" value="{{ role.id }}" {% if role.id in admin_role_ids %}checked{% endif %}>
+                                    <span>{{ role.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <button class="button" type="submit">Save command staff</button>
+                        </form>
+                    </article>
+                </section>
+
+                <section class="panel-grid" id="settings">
+                    <article class="panel-section">
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-tag">Dispatch</span>
+                                <h2>Cooldown</h2>
+                            </div>
+                        </div>
+                        <form method="post" action="/guild/{{ guild.id }}/settings" class="form-stack">
+                            <label>
+                                Minutes between battle alerts
+                                <input class="input" type="number" name="cooldown_minutes" min="0" max="120" value="{{ guild_config.cooldown_minutes }}">
+                            </label>
+                            <button class="button" type="submit">Save cooldown</button>
+                        </form>
+                    </article>
+
+                    <article class="panel-section">
+                        <div class="section-heading">
+                            <div>
+                                <span class="section-tag">Ready to use</span>
+                                <h2>Next step</h2>
+                            </div>
+                        </div>
+                        <div class="command-callout">
+                            <span>Use this in Discord</span>
+                            <code>/battleping</code>
+                            <p>Pick a regiment, drop the VC link, and send the alert.</p>
+                        </div>
+                    </article>
+                </section>
+            </section>
+        </main>
+    </div>
 </body>
 </html>

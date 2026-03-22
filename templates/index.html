@@ -3,56 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BattleBot Command</title>
+    <title>BattleBot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body class="landing-body">
-    <main class="landing-shell">
-        <section class="hero-card">
-            <p class="eyebrow">BattleBot Command</p>
-            <h1>Napoleonic dispatches for Discord regiments.</h1>
-            <p class="lead">
-                Turn battle pings into a real command system: regiment-based DM alerts, secure dashboard links,
-                per-server customization, and Railway-friendly hosting from a single service.
-            </p>
-            <div class="stat-row">
-                <div class="stat-card">
-                    <span class="stat-label">Bot Status</span>
-                    <strong>{{ "Online" if bot_ready else "Offline" }}</strong>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-label">Servers</span>
-                    <strong>{{ guild_count }}</strong>
-                </div>
-            </div>
-            <div class="info-panel">
-                <p>The dashboard now uses Discord login and guild permission checks, so server managers can sign in and manage only the communities they control.</p>
-                <p>Your Railway public URL should be set as <code>PUBLIC_BASE_URL</code>. Current value: <code>{{ public_base_url }}</code></p>
-            </div>
-            <div class="cta-row">
+<body>
+    <div class="app-shell landing-mode">
+        <header class="topbar landing-topbar">
+            <a class="brand" href="/">
+                <span class="brand-mark">B</span>
+                <span>BattleBot</span>
+            </a>
+            <div class="topbar-actions">
                 {% if oauth_ready %}
                     {% if user %}
-                    <a class="button-link" href="{{ dashboard_url }}">Open Dashboard</a>
+                    <a class="button button-secondary" href="{{ dashboard_url }}">Open dashboard</a>
                     {% else %}
-                    <a class="button-link" href="{{ login_url }}">Login with Discord</a>
+                    <a class="button button-secondary" href="{{ login_url }}">Login</a>
                     {% endif %}
                 {% endif %}
                 {% if invite_url %}
-                <a class="button-link button-link-secondary" href="{{ invite_url }}">Invite the Bot</a>
+                <a class="button" href="{{ invite_url }}">Invite bot</a>
                 {% endif %}
             </div>
-            <div class="setup-strip">
-                {% for step in setup_steps %}
-                <div class="setup-step">
-                    <span>{{ loop.index }}</span>
-                    <p>{{ step }}</p>
+        </header>
+
+        <main class="landing-grid">
+            <section class="hero-panel">
+                <div class="hero-copy">
+                    <span class="section-tag">Discord alert system</span>
+                    <h1>Battle alerts without the chaos.</h1>
+                    <p class="hero-text">
+                        BattleBot helps regiment servers notify the right people fast. Map your regiments to Discord roles,
+                        choose who can manage alerts, and send a clean VC dispatch from one dashboard.
+                    </p>
+                    <div class="hero-actions">
+                        {% if oauth_ready %}
+                            {% if user %}
+                            <a class="button" href="{{ dashboard_url }}">Go to dashboard</a>
+                            {% else %}
+                            <a class="button" href="{{ login_url }}">Login with Discord</a>
+                            {% endif %}
+                        {% endif %}
+                        {% if invite_url %}
+                        <a class="button button-secondary" href="{{ invite_url }}">Add to server</a>
+                        {% endif %}
+                    </div>
+                    <div class="hero-stats">
+                        <article class="mini-stat">
+                            <span>Status</span>
+                            <strong>{{ "Online" if bot_ready else "Offline" }}</strong>
+                        </article>
+                        <article class="mini-stat">
+                            <span>Servers</span>
+                            <strong>{{ guild_count }}</strong>
+                        </article>
+                    </div>
                 </div>
+                <div class="hero-preview">
+                    <div class="preview-window">
+                        <div class="preview-header">
+                            <span class="preview-dot"></span>
+                            <span class="preview-dot"></span>
+                            <span class="preview-dot"></span>
+                        </div>
+                        <div class="preview-body">
+                            <div class="preview-sidebar">
+                                <div class="preview-logo"></div>
+                                <div class="preview-nav active"></div>
+                                <div class="preview-nav"></div>
+                                <div class="preview-nav"></div>
+                            </div>
+                            <div class="preview-main">
+                                <div class="preview-card large"></div>
+                                <div class="preview-card-row">
+                                    <div class="preview-card"></div>
+                                    <div class="preview-card"></div>
+                                </div>
+                                <div class="preview-list">
+                                    <div class="preview-line wide"></div>
+                                    <div class="preview-line"></div>
+                                    <div class="preview-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="feature-row">
+                {% for step in setup_steps %}
+                <article class="feature-card">
+                    <span class="feature-number">{{ loop.index }}</span>
+                    <p>{{ step }}</p>
+                </article>
                 {% endfor %}
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
 </body>
 </html>

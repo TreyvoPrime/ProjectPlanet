@@ -3,107 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ guild.name }} | BattleBot Setup Wizard</title>
+    <title>{{ guild.name }} | BattleBot Setup</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <main class="page-shell">
-        <section class="banner">
-            <div>
-                <p class="eyebrow">Setup Wizard</p>
-                <h1>{{ guild.name }}</h1>
-                <p class="lead">This guided flow gets a new server from install to first dispatch without hunting through menus.</p>
+    <div class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="/dashboard/{{ guild.id }}">
+                <span class="brand-mark">B</span>
+                <span>BattleBot</span>
+            </a>
+            <div class="topbar-actions">
+                <a class="button button-secondary" href="/dashboard/{{ guild.id }}">Back to dashboard</a>
             </div>
-            <div class="banner-actions banner-side">
-                <span class="pill">{{ setup_progress.completed }}/{{ setup_progress.total }} complete</span>
-                <a class="text-link" href="/dashboard/{{ guild.id }}">Open Full Dashboard</a>
-            </div>
-        </section>
+        </header>
 
-        <section class="panel">
-            <div class="setup-strip compact">
-                <div class="setup-step {% if setup_progress.has_admin_roles %}complete{% endif %}">
-                    <span>1</span>
-                    <p>Assign command staff roles</p>
+        <main class="page-layout">
+            <section class="page-hero">
+                <div>
+                    <span class="section-tag">Setup guide</span>
+                    <h1>{{ guild.name }}</h1>
+                    <p class="page-subtitle">Use this page once to get your server ready, then run everything from the main dashboard.</p>
                 </div>
-                <div class="setup-step {% if setup_progress.has_regiments %}complete{% endif %}">
-                    <span>2</span>
-                    <p>Add at least one regiment</p>
+                <div class="hero-badges">
+                    <span class="status-chip">{{ setup_progress.completed }} / {{ setup_progress.total }} steps complete</span>
                 </div>
-                <div class="setup-step complete">
-                    <span>3</span>
-                    <p>Use <code>/battleping</code> in Discord</p>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="grid two-up">
-            <article class="panel">
-                <h2>Step 1: Command Staff</h2>
-                <p class="muted">Choose which roles are allowed to configure the bot and dispatch alerts without needing full Administrator.</p>
-                <form method="post" action="/guild/{{ guild.id }}/admin-roles" class="stack">
-                    <div class="checkbox-list">
-                        {% for role in roles %}
-                        <label class="checkbox-row">
-                            <input type="checkbox" name="admin_role_ids" value="{{ role.id }}" {% if role.id in admin_role_ids %}checked{% endif %}>
-                            <span>{{ role.name }}</span>
-                        </label>
-                        {% endfor %}
+            <section class="wizard-stack">
+                <article class="wizard-card">
+                    <div class="wizard-step">1</div>
+                    <div class="wizard-content">
+                        <h2>Choose command staff roles</h2>
+                        <p>Pick the roles that should be allowed to configure BattleBot and send alerts.</p>
+                        <form method="post" action="/guild/{{ guild.id }}/admin-roles" class="form-stack">
+                            <div class="role-grid">
+                                {% for role in roles %}
+                                <label class="role-option">
+                                    <input type="checkbox" name="admin_role_ids" value="{{ role.id }}" {% if role.id in admin_role_ids %}checked{% endif %}>
+                                    <span>{{ role.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <button class="button" type="submit">Save command staff</button>
+                        </form>
                     </div>
-                    <button class="button" type="submit">Save Command Staff</button>
-                </form>
-            </article>
+                </article>
 
-            <article class="panel">
-                <h2>Step 2: Dispatch Timing</h2>
-                <p class="muted">Set how long the server must wait between battle alerts to avoid spam and accidental double dispatches.</p>
-                <form method="post" action="/guild/{{ guild.id }}/settings" class="stack">
-                    <label>
-                        Cooldown Minutes
-                        <input class="input" type="number" name="cooldown_minutes" min="0" max="120" value="{{ guild_config.cooldown_minutes }}">
-                    </label>
-                    <button class="button" type="submit">Save Cooldown</button>
-                </form>
-            </article>
-        </section>
-
-        <section class="grid two-up">
-            <article class="panel">
-                <h2>Step 3: First Regiment</h2>
-                <p class="muted">Map the name shown in the battle selector to the actual Discord role that should receive the DM dispatch.</p>
-                <form method="post" action="/guild/{{ guild.id }}/regiments" class="stack">
-                    <label>
-                        Regiment Name
-                        <input class="input" type="text" name="regiment_name" maxlength="60" placeholder="95th Rifles" required>
-                    </label>
-                    <label>
-                        Discord Role
-                        <select class="input" name="role_id" required>
-                            <option value="">Select a role</option>
-                            {% for role in roles %}
-                            <option value="{{ role.id }}">{{ role.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
-                    <button class="button" type="submit">Create Regiment</button>
-                </form>
-            </article>
-
-            <article class="panel">
-                <h2>Step 4: Dispatch Orders</h2>
-                <div class="stack">
-                    <p class="muted">Once you have at least one regiment configured, go back to Discord and use the command below.</p>
-                    <div class="command-card">
-                        <code>/battleping</code>
+                <article class="wizard-card">
+                    <div class="wizard-step">2</div>
+                    <div class="wizard-content">
+                        <h2>Set the alert cooldown</h2>
+                        <p>Choose how long the server should wait between battle alerts.</p>
+                        <form method="post" action="/guild/{{ guild.id }}/settings" class="form-stack narrow-form">
+                            <label>
+                                Cooldown in minutes
+                                <input class="input" type="number" name="cooldown_minutes" min="0" max="120" value="{{ guild_config.cooldown_minutes }}">
+                            </label>
+                            <button class="button" type="submit">Save cooldown</button>
+                        </form>
                     </div>
-                    <p class="muted">Choose the regiment, paste the VC link, write the order, and the bot will DM only the members who are not already in that voice channel.</p>
-                    <a class="button-link button-link-secondary" href="/dashboard/{{ guild.id }}">Return to Dashboard</a>
-                </div>
-            </article>
-        </section>
-    </main>
+                </article>
+
+                <article class="wizard-card">
+                    <div class="wizard-step">3</div>
+                    <div class="wizard-content">
+                        <h2>Add your first regiment</h2>
+                        <p>Map the regiment name your staff will choose to the Discord role that should receive the alert.</p>
+                        <form method="post" action="/guild/{{ guild.id }}/regiments" class="form-stack narrow-form">
+                            <label>
+                                Regiment name
+                                <input class="input" type="text" name="regiment_name" maxlength="60" placeholder="95th Rifles" required>
+                            </label>
+                            <label>
+                                Discord role
+                                <select class="input" name="role_id" required>
+                                    <option value="">Select a role</option>
+                                    {% for role in roles %}
+                                    <option value="{{ role.id }}">{{ role.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <button class="button" type="submit">Save regiment</button>
+                        </form>
+                    </div>
+                </article>
+
+                <article class="wizard-card">
+                    <div class="wizard-step">4</div>
+                    <div class="wizard-content">
+                        <h2>Send your first alert</h2>
+                        <p>Go back to Discord and run the command below to send a VC alert.</p>
+                        <div class="command-callout inline-callout">
+                            <span>Discord command</span>
+                            <code>/battleping</code>
+                            <p>Pick the regiment, paste the voice channel link, add your message, and send it.</p>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
 </body>
 </html>
