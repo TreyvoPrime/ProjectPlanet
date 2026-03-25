@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="shell hero-shell">
+      <section class="hero-card">
+        <p class="eyebrow">Discord + DeepSeek + Railway</p>
+        <h1>Study Assistant Bot</h1>
+        <p class="lede">
+          A study-focused Discord bot with slash commands, a lightweight dashboard, per-server
+          DeepSeek settings, and SQLite persistence built for Railway.
+        </p>
+
+        <% if (flash?.error) { %>
+          <div class="notice error"><%= flash.error %></div>
+        <% } %>
+        <% if (flash?.success) { %>
+          <div class="notice success"><%= flash.success %></div>
+        <% } %>
+
+        <div class="actions">
+          <% if (currentUser) { %>
+            <a class="button primary" href="/dashboard">Open My Servers</a>
+            <a class="button secondary" href="/logout">Log out</a>
+          <% } else { %>
+            <a class="button primary" href="/auth/login">Login with Discord</a>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="feature-grid">
+        <article class="feature-card">
+          <h2>Study commands</h2>
+          <p>Generate questions, explain topics, grade student responses, and tune depth per guild.</p>
+        </article>
+        <article class="feature-card">
+          <h2>Server dashboard</h2>
+          <p>Manage model choice, token limits, rubric defaults, and usage visibility from one place.</p>
+        </article>
+        <article class="feature-card">
+          <h2>Railway-ready</h2>
+          <p>Single Node process, SQLite on a mounted volume, and a plain `npm run start` deploy path.</p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

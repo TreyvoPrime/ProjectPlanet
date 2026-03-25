@@ -1,0 +1,31 @@
+{
+  "name": "study-assistant-bot",
+  "version": "1.0.0",
+  "description": "Discord study assistant bot with DeepSeek, Express dashboard, SQLite, and Railway-ready deployment.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1"
+  },
+  "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^4.17.21",
+    "@types/express-session": "^1.18.1",
+    "@types/node": "^24.3.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

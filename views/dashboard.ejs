@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Dashboard</p>
+          <h1>My Servers</h1>
+        </div>
+        <div class="header-actions">
+          <a class="button secondary" href="/">Home</a>
+          <a class="button secondary" href="/logout">Log out</a>
+        </div>
+      </header>
+
+      <% if (flash?.error) { %>
+        <div class="notice error"><%= flash.error %></div>
+      <% } %>
+      <% if (flash?.success) { %>
+        <div class="notice success"><%= flash.success %></div>
+      <% } %>
+
+      <section class="server-list">
+        <% if (guilds.length === 0) { %>
+          <div class="empty-state">
+            <h2>No shared servers found</h2>
+            <p>Add the bot to a server you manage, then refresh this page.</p>
+          </div>
+        <% } %>
+
+        <% guilds.forEach((guild) => { %>
+          <article class="server-card">
+            <div>
+              <h2><%= guild.name %></h2>
+              <p><%= guild.canManage ? 'You can manage this server.' : 'View only until you have Manage Server access.' %></p>
+            </div>
+            <% if (guild.canManage) { %>
+              <a class="button primary" href="/dashboard/guild/<%= guild.id %>">Open settings</a>
+            <% } %>
+          </article>
+        <% }) %>
+      </section>
+    </main>
+  </body>
+</html>

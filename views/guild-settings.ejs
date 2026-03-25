@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Guild Settings</p>
+          <h1><%= guild.name %></h1>
+        </div>
+        <div class="header-actions">
+          <a class="button secondary" href="/dashboard">Back</a>
+          <a class="button secondary" href="/logout">Log out</a>
+        </div>
+      </header>
+
+      <% if (flash?.error) { %>
+        <div class="notice error"><%= flash.error %></div>
+      <% } %>
+      <% if (flash?.success) { %>
+        <div class="notice success"><%= flash.success %></div>
+      <% } %>
+
+      <section class="settings-layout">
+        <form class="settings-card" method="post" action="/dashboard/guild/<%= guild.id %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+          <label>
+            <span>Default DeepSeek model</span>
+            <select name="defaultModel">
+              <% models.forEach((model) => { %>
+                <option value="<%= model %>" <%= settings.defaultModel === model ? 'selected' : '' %>><%= model %></option>
+              <% }) %>
+            </select>
+          </label>
+
+          <label class="checkbox-row">
+            <input type="checkbox" name="fastMode" <%= settings.fastMode ? 'checked' : '' %> />
+            <span>Enable fast mode by default</span>
+          </label>
+
+          <label>
+            <span>Temperature</span>
+            <input type="range" name="temperature" min="0" max="1.5" step="0.05" value="<%= settings.temperature %>" />
+            <small>Current: <%= settings.temperature %></small>
+          </label>
+
+          <label>
+            <span>Max tokens</span>
+            <input type="number" name="maxTokens" min="200" max="4000" value="<%= settings.maxTokens %>" />
+          </label>
+
+          <label>
+            <span>Default language level</span>
+            <select name="languageLevel">
+              <% ['beginner', 'intermediate', 'advanced'].forEach((level) => { %>
+                <option value="<%= level %>" <%= settings.languageLevel === level ? 'selected' : '' %>><%= level %></option>
+              <% }) %>
+            </select>
+          </label>
+
+          <label>
+            <span>Default grading rubric</span>
+            <textarea name="gradingRubricJson" rows="12"><%= settings.gradingRubricJson %></textarea>
+          </label>
+
+          <button class="button primary" type="submit">Save settings</button>
+        </form>
+
+        <aside class="settings-card">
+          <h2>Usage this month</h2>
+          <dl class="stats-list">
+            <div>
+              <dt>Calls</dt>
+              <dd><%= usage.callsThisMonth %></dd>
+            </div>
+            <div>
+              <dt>Total tokens</dt>
+              <dd><%= usage.tokensThisMonth %></dd>
+            </div>
+            <div>
+              <dt>Estimated cost</dt>
+              <dd>$<%= usage.estimatedCostThisMonth.toFixed(4) %></dd>
+            </div>
+          </dl>
+
+          <p class="aside-note">
+            Dashboard access requires the bot to be in the server and your Discord account to have
+            Manage Server permission or ownership.
+          </p>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>

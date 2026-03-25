@@ -1,111 +1,87 @@
-# BattleBot Command
+# Study Assistant Bot
 
-BattleBot Command is a public-facing Discord bot for regiment-style battle dispatches. Server managers log in with Discord, configure regiment-to-role mappings in a Napoleonic-themed dashboard, and use `/battleping` to DM the right rankers with the VC link while skipping members already in that voice channel.
+Study Assistant Bot is a Discord bot plus web dashboard built with Node.js, TypeScript, Express, EJS, SQLite, and DeepSeek. It is designed to run as a single Railway service with one start command and a persistent SQLite file mounted under `/data`.
 
-## Launch Stack
+## Stack
 
-- Python + `discord.py`
-- FastAPI dashboard
-- SQLite for launch storage
-- Railway for hosting
+- Discord bot: `discord.js`
+- Web dashboard: Express + EJS
+- Database: SQLite via `better-sqlite3`
+- AI backend: DeepSeek chat completions API
+- Auth: Discord OAuth2 (`identify guilds`)
+- Deploy target: Railway
 
-## Core Features
+## Features
 
-- Discord OAuth login for the dashboard
-- Guild permission checks before showing server settings
-- Per-server command staff roles
-- Per-server regiment mappings
-- Per-server cooldowns
-- SQLite-backed server-side OAuth sessions
-- Guided setup wizard for first-time server onboarding
+- Slash commands for question generation, topic explanation, grading, config, and health checks
+- Per-guild DeepSeek configuration
+- Discord OAuth dashboard for server management
+- SQLite-backed app data and SQLite-backed web sessions
+- Railway-ready defaults with a single `npm run start`
 
-## Environment Variables
+## Required Environment Variables
 
-Copy `.env.example` and set these values:
+Copy [`.env.example`](/C:/Users/trey2/Desktop/BattleBot/.env.example) and set:
 
-- `DISCORD_TOKEN`
+- `DISCORD_BOT_TOKEN`
 - `DISCORD_CLIENT_ID`
 - `DISCORD_CLIENT_SECRET`
-- `PUBLIC_BASE_URL`
 - `DISCORD_REDIRECT_URI`
+- `DEEPSEEK_API_KEY`
 - `SESSION_SECRET`
 
-Optional:
+Common optional values:
 
-- `DATABASE_PATH`
-- `DEFAULT_COOLDOWN_MINUTES`
-- `DM_SEND_DELAY_SECONDS`
-- `DISCORD_BOT_PERMISSIONS`
+- `PORT=3000`
+- `SQLITE_PATH=/data/studybot.db`
+- `PUBLIC_BASE_URL=https://your-railway-app.up.railway.app`
+- `DISCORD_DEV_GUILD_ID=` for guild-scoped slash command registration while developing
+- `DEEPSEEK_BASE_URL=https://api.deepseek.com`
 
 ## Local Run
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000
+npm install
+npm run build
+npm run dev
 ```
 
-Open `http://127.0.0.1:8000`.
+Open `http://127.0.0.1:3000`.
 
-## Railway Setup
+## Railway Notes
 
-1. Push this repo to GitHub.
-2. Create a fresh Railway project from the GitHub repo.
-3. Make sure the project contains only one public app service for this repo. Do not attach your public domain to any database service.
-4. Prefer the Dockerfile deploy path for a deterministic build.
-5. Add a persistent volume and mount it only if you want SQLite persistence across redeploys.
-6. Set the environment variables from `.env.example`.
-7. In the Discord Developer Portal, add the Railway callback URL:
-   `https://your-app.up.railway.app/auth/callback`
-8. Deploy.
+- Start command: `npm run start`
+- Build command: `npm run build`
+- Set `SQLITE_PATH=/data/studybot.db`
+- Mount a persistent volume to `/data`
+- Set `DISCORD_REDIRECT_URI=https://your-service.up.railway.app/auth/callback`
+- Add that same callback URL in the Discord Developer Portal
 
-Recommended `DATABASE_PATH` on Railway:
-
-```text
-/data/battlebot.db
-```
-
-Fastest test-only fallback if you do not have a volume mounted yet:
-
-```text
-./battlebot.db
-```
-
-## Clean Railway Rebuild
-
-If Railway got into a weird state with multiple services or the public domain is pointing at the wrong thing, the clean reset path is:
-
-1. Create a brand new Railway project.
-2. Deploy only this GitHub repository into that new project.
-3. Do not add MySQL or any other database service.
-4. Generate one public domain for the app service only.
-5. Set:
-   `PUBLIC_BASE_URL=https://your-service.up.railway.app`
-6. Set:
-   `DISCORD_REDIRECT_URI=https://your-service.up.railway.app/auth/callback`
-7. Add that same callback URL in the Discord Developer Portal.
-8. Redeploy and test `/healthz`.
-
-## Discord Application Setup
+## Discord App Setup
 
 In the Discord Developer Portal:
 
-- Enable the `SERVER MEMBERS INTENT`
-- Add OAuth redirect URL: `https://your-app.up.railway.app/auth/callback`
-- Use the bot invite URL from the landing page or dashboard
+1. Create an application and bot.
+2. Copy the client ID, client secret, and bot token into Railway or your local `.env`.
+3. Add your callback URL to OAuth2 redirects.
+4. Invite the bot with `applications.commands` and `bot` scopes.
+5. Grant at least `Send Messages`, `Use Slash Commands`, and `Read Message History`.
 
-## Health Check
+## Project Layout
 
-- `GET /healthz`
+- [`package.json`](/C:/Users/trey2/Desktop/BattleBot/package.json)
+- [`tsconfig.json`](/C:/Users/trey2/Desktop/BattleBot/tsconfig.json)
+- [`src/index.ts`](/C:/Users/trey2/Desktop/BattleBot/src/index.ts)
+- [`src/config.ts`](/C:/Users/trey2/Desktop/BattleBot/src/config.ts)
+- [`src/db/index.ts`](/C:/Users/trey2/Desktop/BattleBot/src/db/index.ts)
+- [`src/discord/bot.ts`](/C:/Users/trey2/Desktop/BattleBot/src/discord/bot.ts)
+- [`src/discord/deepseekClient.ts`](/C:/Users/trey2/Desktop/BattleBot/src/discord/deepseekClient.ts)
+- [`src/web/server.ts`](/C:/Users/trey2/Desktop/BattleBot/src/web/server.ts)
+- [`src/web/routes/dashboard.ts`](/C:/Users/trey2/Desktop/BattleBot/src/web/routes/dashboard.ts)
 
-## GitHub Push
+## Railway Start Command
 
-```powershell
-git init
-git add .
-git commit -m "Initial BattleBot launch"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
-```
+Railway can use either:
+
+- `npm run start`
+- `Procfile` with `web: npm run start`
