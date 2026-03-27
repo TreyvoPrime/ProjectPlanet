@@ -6,188 +6,189 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/public/styles.css" />
   </head>
-  <body class="cosmic-app">
-    <div class="cosmic-backdrop" aria-hidden="true">
-      <span class="cosmic-orb cosmic-orb--one"></span>
-      <span class="cosmic-orb cosmic-orb--two"></span>
-      <span class="cosmic-orb cosmic-orb--three"></span>
-      <span class="cosmic-grid-lines"></span>
+  <body class="planet-app">
+    <div class="planet-bg" aria-hidden="true">
+      <div class="planet-bg__stars"></div>
+      <div class="planet-bg__glow planet-bg__glow--one"></div>
+      <div class="planet-bg__glow planet-bg__glow--two"></div>
+      <div class="planet-bg__grid"></div>
     </div>
 
-    <main class="cosmic-shell">
-      <section class="cosmic-hero cosmic-panel">
-        <div class="cosmic-hero__copy">
-          <p class="eyebrow">Cosmic Card Pack Battle</p>
-          <h1>Pack opens, planet pulls, and nebula duels.</h1>
-          <p class="lede">
-            This view establishes the visual system for the game: generated-safe card art, rarity-first
-            frames, neon glows, and a data shape ready for pack openings and battles.
+    <main class="app-shell">
+      <header class="hero-panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Project Planet</p>
+          <h1>Open packs, build your space collection, and battle the cosmos.</h1>
+          <p class="hero-text">
+            Pull real celestial objects, grow your owned collection, and bring one card at a time
+            into the arena. Packs unlock cards. Collection stores only what you pulled. Battles
+            turn your best finds into stardust.
           </p>
-
-          <div class="cosmic-pills">
-            <span class="cosmic-pill">Generated SVG fallback</span>
-            <span class="cosmic-pill">Rarity-driven glow</span>
-            <span class="cosmic-pill">LocalStorage save loop</span>
-          </div>
         </div>
 
-        <aside class="cosmic-hero__preview cosmic-panel-inner" data-featured-card></aside>
+        <div class="hero-side">
+          <div class="hero-metrics">
+            <article class="metric-card">
+              <span class="metric-label">Stardust</span>
+              <strong data-stat="stardust">300</strong>
+              <small data-stat="stardust-note">Enough for a pack.</small>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Collection</span>
+              <strong data-stat="owned-count">0</strong>
+              <small data-stat="owned-note">No cards pulled yet.</small>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Record</span>
+              <strong><span data-stat="wins">0</span> / <span data-stat="losses">0</span></strong>
+              <small data-stat="battle-note">Every battle helps your aura grow.</small>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Daily Pack</span>
+              <strong data-stat="daily-pack">Ready</strong>
+              <small data-stat="daily-pack-note">Your free daily pull is waiting.</small>
+            </article>
+          </div>
+          <div class="hero-preview card-preview" data-featured-card></div>
+        </div>
+      </header>
+
+      <nav class="section-tabs" aria-label="Game sections">
+        <button class="section-tab is-active" data-action="switch-tab" data-tab="packs" type="button">
+          Packs
+        </button>
+        <button class="section-tab" data-action="switch-tab" data-tab="collection" type="button">
+          Collection
+        </button>
+        <button class="section-tab" data-action="switch-tab" data-tab="battle" type="button">
+          Battle
+        </button>
+        <button class="sound-button" data-action="toggle-sound" type="button">Sound: On</button>
+      </nav>
+
+      <section class="tab-panel is-active" data-panel="packs">
+        <div class="section-card pack-layout">
+          <div class="panel-copy">
+            <p class="eyebrow">Pack Chamber</p>
+            <h2>Open a four-card cosmic pack</h2>
+            <p class="section-text">
+              Packs reveal one card at a time with weighted rarity odds. Legendary and higher pulls
+              get special effects. Duplicate pulls convert into bonus stardust.
+            </p>
+            <div class="action-row">
+              <button class="primary-button" data-action="open-pack" type="button">Claim Daily Pack</button>
+              <span class="status-pill" data-pack-cost>100 Stardust per paid pack</span>
+            </div>
+            <div class="status-box" data-pack-status>Ready to open a pack.</div>
+            <div class="odds-list">
+              <span>Common 52%</span>
+              <span>Rare 24%</span>
+              <span>Epic 12%</span>
+              <span>Legendary 7%</span>
+              <span>Mythic 4%</span>
+              <span>Cosmic 1%</span>
+            </div>
+          </div>
+
+          <div class="pack-visual">
+            <div class="pack-shell" data-pack-shell>
+              <div class="pack-shell__aura"></div>
+              <div class="pack-shell__core"></div>
+            </div>
+            <div class="recent-pulls">
+              <div class="recent-pulls__header">
+                <h3>Latest Pulls</h3>
+                <small data-card-count>Loading archive...</small>
+              </div>
+              <div class="recent-pulls__grid" data-recent-pulls></div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section class="cosmic-toolbar cosmic-panel">
-        <div>
-          <p class="eyebrow">Card Library</p>
-          <h2>Collect the cosmic archive</h2>
-        </div>
-        <div class="cosmic-toolbar__meta">
-          <span data-card-count>Loading cards...</span>
-          <span>Safe art source: local SVG generation</span>
-        </div>
-      </section>
-
-      <section class="cosmic-hud cosmic-panel">
-        <div class="cosmic-hud__stats">
-          <article class="cosmic-stat-card">
-            <span data-stat="stardust">300</span>
-            <small data-stat="stardust-note">Enough to buy a pack.</small>
-          </article>
-          <article class="cosmic-stat-card">
-            <span data-stat="wins">0</span>
-            <small>Wins</small>
-          </article>
-          <article class="cosmic-stat-card">
-            <span data-stat="losses">0</span>
-            <small>Losses</small>
-          </article>
-          <article class="cosmic-stat-card">
-            <span data-stat="owned-count">0</span>
-            <small data-stat="owned-note">No cards claimed yet.</small>
-          </article>
-          <article class="cosmic-stat-card">
-            <span data-stat="daily-pack">Ready</span>
-            <small data-stat="daily-pack-note">One free pack is waiting for today.</small>
-          </article>
-          <article class="cosmic-stat-card">
-            <span data-stat="battle-note">Any card can flip the next fight.</span>
-            <small>Battle mood</small>
-          </article>
-        </div>
-
-        <div class="cosmic-hud__actions">
-          <button class="button primary cosmic-button" data-action="open-pack">Claim Daily Pack</button>
-          <button class="button secondary cosmic-button" data-action="battle-random">Battle Selected</button>
-          <button class="button secondary cosmic-button" data-action="sort-rarity">Sort by Rarity</button>
-          <button class="button secondary cosmic-button" data-action="sort-aura">Sort by Aura</button>
-          <button class="button secondary cosmic-button" data-action="toggle-sound">Sound: On</button>
-        </div>
-      </section>
-
-      <section class="cosmic-grid">
-        <article class="cosmic-stage cosmic-stage--pack cosmic-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Pack Opening</p>
-              <h2>Shake, glow, burst, reveal</h2>
-            </div>
-            <span class="cosmic-chip">4-card packs</span>
-          </div>
-          <div class="cosmic-pack-scene">
-            <div class="cosmic-pack-core" aria-hidden="true"></div>
-            <div class="cosmic-pack-rays" aria-hidden="true"></div>
-            <div class="cosmic-pack-tray">
-              <div class="cosmic-pack-slot"></div>
-              <div class="cosmic-pack-slot"></div>
-              <div class="cosmic-pack-slot"></div>
-              <div class="cosmic-pack-slot"></div>
-            </div>
-          </div>
-        </article>
-
-        <article class="cosmic-stage cosmic-stage--battle cosmic-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Battle Arena</p>
-              <h2>VS layout and stat bars</h2>
-            </div>
-            <span class="cosmic-chip">Aura weighted power</span>
-          </div>
-          <div class="cosmic-vs-scene">
-            <div class="cosmic-battle-card cosmic-battle-card--left">
-              <span>Player card</span>
-              <strong>Selected cosmic champion</strong>
-            </div>
-            <div class="cosmic-vs-badge">VS</div>
-            <div class="cosmic-battle-card cosmic-battle-card--right">
-              <span>Opponent card</span>
-              <strong>Randomized celestial rival</strong>
-            </div>
-          </div>
-          <div class="cosmic-stat-bars">
-            <div class="cosmic-stat-bar"><span>Attack</span><i></i></div>
-            <div class="cosmic-stat-bar"><span>Defense</span><i></i></div>
-            <div class="cosmic-stat-bar"><span>Speed</span><i></i></div>
-            <div class="cosmic-stat-bar"><span>Energy</span><i></i></div>
-            <div class="cosmic-stat-bar"><span>Aura</span><i></i></div>
-          </div>
-        </article>
-
-        <article class="cosmic-stage cosmic-stage--collection cosmic-panel">
+      <section class="tab-panel" data-panel="collection">
+        <div class="section-card">
           <div class="section-head">
             <div>
               <p class="eyebrow">Collection</p>
-              <h2>Scrollable gallery</h2>
+              <h2>Your owned archive</h2>
+              <p class="section-text">
+                Only cards you pull from packs appear here. Pick one to prepare it for battle.
+              </p>
             </div>
-            <span class="cosmic-chip">Hover for glow and tilt</span>
+            <div class="action-row compact">
+              <button class="ghost-button" data-action="sort-rarity" type="button">Sort by rarity</button>
+              <button class="ghost-button" data-action="sort-aura" type="button">Sort by power</button>
+            </div>
           </div>
-          <div class="cosmic-card-grid" data-card-gallery></div>
-        </article>
+
+          <div class="collection-summary">
+            <div class="summary-pill" data-category-summary>0 categories discovered</div>
+            <div class="summary-pill" data-selection-summary>No card selected</div>
+          </div>
+
+          <div class="collection-grid" data-collection-grid></div>
+        </div>
       </section>
 
-      <section class="cosmic-stage cosmic-stage--archive cosmic-panel">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Archive and battle hooks</p>
-            <h2>Selectable collection grid</h2>
+      <section class="tab-panel" data-panel="battle">
+        <div class="section-card battle-layout">
+          <div class="battle-sidebar">
+            <p class="eyebrow">Battle Mode</p>
+            <h2>Send one card into the arena</h2>
+            <p class="section-text">
+              Select a card from your collection, then challenge a random rival from the full cosmic archive.
+            </p>
+            <div class="selected-card-slot" data-battle-selected></div>
+            <div class="action-row">
+              <button class="primary-button" data-action="battle-random" type="button">Battle Random Opponent</button>
+            </div>
           </div>
-          <span class="cosmic-chip">Ready for pack and battle logic</span>
+
+          <div class="battle-main">
+            <div class="battle-summary" data-battle-summary>
+              Pull cards from packs first, then choose one from your collection to battle with it.
+            </div>
+            <div class="battle-history" data-battle-history></div>
+          </div>
         </div>
-        <div class="archive-pack-stage">
-          <p class="archive-pack-copy">Open a pack to launch the opening sequence.</p>
-          <div class="archive-pack-results" aria-hidden="true"></div>
-        </div>
-        <p class="pack-status" data-pack-status>Ready to open a pack.</p>
-        <div class="collection-grid" data-collection-grid></div>
       </section>
     </main>
 
-    <div class="overlay-layer">
-      <section class="pack-overlay hidden" data-pack-overlay aria-hidden="true">
-        <div class="overlay-card pack-stage">
-          <h2>Pack Opening</h2>
-          <div class="pack-drama" data-pack-drama>
-            <div class="pack-core"></div>
+    <section class="overlay hidden" data-pack-overlay aria-hidden="true">
+      <div class="overlay-card pack-overlay-card">
+        <div class="overlay-head">
+          <div>
+            <p class="eyebrow">Pack Opening</p>
+            <h2>Cosmic reveal sequence</h2>
           </div>
-          <div class="pack-results" data-pack-results></div>
+          <button class="ghost-button" data-action="close-pack" type="button">Skip</button>
         </div>
-      </section>
+        <div class="pack-stage" data-pack-drama>
+          <div class="pack-stage__core"></div>
+        </div>
+        <div class="pack-results" data-pack-results></div>
+      </div>
+    </section>
 
-      <section class="battle-overlay hidden" data-battle-overlay aria-hidden="true">
-        <div class="overlay-card battle-stage">
-          <div class="battle-header">
-            <h2>Battle Results</h2>
-            <button class="button secondary cosmic-button" data-action="close-battle">Close</button>
+    <section class="overlay hidden" data-battle-overlay aria-hidden="true">
+      <div class="overlay-card battle-overlay-card">
+        <div class="overlay-head">
+          <div>
+            <p class="eyebrow">Battle Result</p>
+            <h2>Stat-by-stat showdown</h2>
           </div>
-          <div class="battle-compare">
-            <div class="battle-side" data-battle-player></div>
-            <div class="battle-versus">VS</div>
-            <div class="battle-side" data-battle-opponent></div>
-          </div>
-          <div class="battle-bars" data-battle-bars></div>
-          <div class="battle-result" data-battle-result></div>
-          <div class="battle-summary" data-battle-summary></div>
+          <button class="ghost-button" data-action="close-battle" type="button">Close</button>
         </div>
-      </section>
-    </div>
+        <div class="battle-versus">
+          <article class="battle-combatant" data-battle-player></article>
+          <div class="battle-versus__badge">VS</div>
+          <article class="battle-combatant" data-battle-opponent></article>
+        </div>
+        <div class="battle-bars" data-battle-bars></div>
+        <div class="battle-outcome" data-battle-result></div>
+      </div>
+    </section>
 
     <script src="/public/cosmic-card-library.js"></script>
     <script src="/public/cosmic-card-game.js"></script>

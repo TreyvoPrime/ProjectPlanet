@@ -11,6 +11,10 @@ Original prompt: Develop the visual language for the cosmic cards and source ima
 - Wired the interactive game loop into the shared card library, including pack opening, collection saving, daily pack claims, aura leveling, and local battle resolution.
 - Added generated SVG card art into collection tiles, reveal cards, and battle cards so every shipped card has a working image without network fetches.
 - Added stat-by-stat battle comparison bars, reward tracking, and deterministic `window.advanceTime` / `window.render_game_to_text` hooks for browser testing.
+- Rebuilt the page into separate Packs, Collection, and Battle tabs so the game no longer feels like one long landing page.
+- Expanded the card database heavily with more asteroids, dwarf planets, stars, galaxies, and black holes.
+- Switched card art loading to real object imagery via Wikipedia summary thumbnails with generated SVG fallback caching when a remote image is unavailable.
+- Tightened the pack/collection/battle loop so only pulled cards enter the collection and battles require an owned selected card.
 
 ## Follow-ups
 - If a future pass wants more than the current representative roster, expand `public/cosmic-card-library.js` with additional celestial objects while keeping the same schema.
