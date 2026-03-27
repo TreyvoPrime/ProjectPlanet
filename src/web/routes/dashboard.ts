@@ -22,8 +22,14 @@ export function createDashboardRouter(db: AppDatabase, botClient: Client): Route
   const router = Router();
 
   router.get('/', (request, response) => {
-    response.render('home', {
-      title: 'Study Assistant Bot'
+    response.render('cosmic-game', {
+      title: 'Cosmic Card Pack Battle'
+    });
+  });
+
+  router.get('/cosmic-card-battle', (_request, response) => {
+    response.render('cosmic-game', {
+      title: 'Cosmic Card Pack Battle'
     });
   });
 
